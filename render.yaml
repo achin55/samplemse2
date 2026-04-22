@@ -3,6 +3,8 @@ services:
     name: samplemse2-backend
     runtime: node
     plan: free
+    repo: https://github.com/achin55/samplemse2.git
+    branch: main
     rootDir: backend
     buildCommand: npm install
     startCommand: npm start
@@ -16,13 +18,13 @@ services:
 
   - type: web
     name: samplemse2-frontend
-    runtime: static
+    runtime: node
     plan: free
+    repo: https://github.com/achin55/samplemse2.git
+    branch: main
     rootDir: frontend
     buildCommand: npm install && npm run build
-    staticPublishPath: build
+    startCommand: npm install -g serve && serve -s build
     envVars:
       - key: REACT_APP_API_URL
-        fromService:
-          name: samplemse2-backend
-          property: url
+        value: https://samplemse2-backend.onrender.com
