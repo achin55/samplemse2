@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 export const AuthContext = createContext();
@@ -8,15 +8,14 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // Check if user is logged in on mount
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      fetchUser();
-    }
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common['Authorization'];
+    setToken(null);
+    setUser(null);
   }, []);
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const response = await axios.get('/api/auth/me');
       setUser(response.data.user);
@@ -24,7 +23,15 @@ export const AuthProvider = ({ children }) => {
       console.log('Error fetching user:', error);
       logout();
     }
-  };
+  }, [logout]);
+
+  useEffect(() => {
+    // Check if user is logged in on mount
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      fetchUser();
+    }
+  }, [token, fetchUser]);
 
   const register = async (name, email, password, passwordConfirm) => {
     setLoading(true);
@@ -72,13 +79,6 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
-    setToken(null);
-    setUser(null);
   };
 
   return (

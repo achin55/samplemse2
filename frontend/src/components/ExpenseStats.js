@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { ExpenseContext } from '../context/ExpenseContext';
 import './ExpenseStats.css';
 
@@ -6,11 +6,7 @@ const ExpenseStats = () => {
   const { expenses } = useContext(ExpenseContext);
   const [stats, setStats] = useState({});
 
-  useEffect(() => {
-    calculateStats();
-  }, [expenses]);
-
-  const calculateStats = () => {
+  const calculateStats = useCallback(() => {
     const categorized = {
       'Food': 0,
       'Travel': 0,
@@ -29,7 +25,13 @@ const ExpenseStats = () => {
     });
 
     setStats(categorized);
-  };
+  }, [expenses]);
+
+  useEffect(() => {
+    calculateStats();
+  }, [calculateStats]);
+
+
 
   const getCategoryColor = (category) => {
     const colors = {

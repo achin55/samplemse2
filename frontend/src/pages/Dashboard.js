@@ -12,7 +12,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchExpenses();
-  }, []);
+  }, [fetchExpenses]);
 
   const handleFilterChange = (category) => {
     setSelectedCategory(category);
